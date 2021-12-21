@@ -25,7 +25,7 @@ app.get('/stripe-key', (req, res) => {
 });
 
 app.post('/create-payment-intent', async (req, res) => {
-  const {email, items, currency, payment_method_types = []} = req.body;
+  const {email, currency} = req.body;
   const stripe = new Stripe(stripeSecretKey, {
     apiVersion: '2020-08-27',
     typescript: true,
@@ -42,7 +42,6 @@ app.post('/create-payment-intent', async (req, res) => {
         request_three_d_secure: 'automatic',
       },
     },
-    payment_method_types: payment_method_types,
   };
   try {
     const paymentIntent = await stripe.paymentIntents.create(params);

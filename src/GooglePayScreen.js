@@ -1,11 +1,5 @@
 import React from 'react';
-import {
-  Platform,
-  SafeAreaView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-} from 'react-native';
+import {Platform, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import stripe from 'tipsi-stripe';
 
 const GooglePayScreen = () => {
@@ -48,13 +42,13 @@ const GooglePayScreen = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View>
       {Platform.OS === 'android' && (
         <TouchableOpacity style={styles.button} onPress={handlePressPay}>
           <Text style={styles.text}>Pay with GooglePay</Text>
         </TouchableOpacity>
       )}
-    </SafeAreaView>
+    </View>
   );
 };
 

@@ -1,14 +1,9 @@
-import React from 'react';
-import {
-  Platform,
-  SafeAreaView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-} from 'react-native';
+import React, {useState} from 'react';
+import {Platform, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import stripe from 'tipsi-stripe';
 
 const ApplePayScreen = () => {
+  const [applePayToken, setToken] = useState();
   const handlePressPay = async () => {
     try {
       const token = await stripe.paymentRequestWithNativePay(
@@ -41,6 +36,8 @@ const ApplePayScreen = () => {
       );
       console.log(token);
 
+      setToken(token);
+
       await stripe.completeNativePayRequest();
     } catch (error) {
       console.error(`Error: ${error.message}`);
@@ -48,13 +45,14 @@ const ApplePayScreen = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View>
       {Platform.OS === 'ios' && (
         <TouchableOpacity style={styles.button} onPress={handlePressPay}>
           <Text style={styles.text}>Pay with ApplePay</Text>
         </TouchableOpacity>
       )}
-    </SafeAreaView>
+      <Text>{JSON.stringify(applePayToken, null, 2)}</Text>
+    </View>
   );
 };
 

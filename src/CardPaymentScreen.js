@@ -1,15 +1,16 @@
 import React, {useState} from 'react';
 import {
-  SafeAreaView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
+  View,
 } from 'react-native';
 import stripe from 'tipsi-stripe';
 import {BACKEND_URL} from './config';
 
 const CardPaymentScreen = () => {
+  const [paymentIntent, setPaymentIntent] = useState();
   const [cardDetails, setCardDetails] = useState({
     number: null,
     expMonth: null,
@@ -19,27 +20,28 @@ const CardPaymentScreen = () => {
 
   const createPaymentIntent = async () => {
     try {
-      const response = await fetch(`${BACKEND_URL}/create_intent`, {
+      const response = await fetch(`${BACKEND_URL}/create-payment-intent`, {
         method: 'POST',
         headers: {
           Accept: 'application/json',
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          amount: 2000,
           currency: 'usd',
+          email: 'test@stripe.com',
         }),
       });
       return await response.json();
     } catch (error) {
-      return null;
+      console.log(error);
+      return {};
     }
   };
 
   const handlePressPay = async () => {
-    const paymentIntent = await createPaymentIntent();
+    const {clientSecret} = await createPaymentIntent();
 
-    if (!paymentIntent) {
+    if (!clientSecret) {
       console.error("Couldn't create a PaymentIntent");
     }
 
@@ -58,7 +60,7 @@ const CardPaymentScreen = () => {
       };
 
       const confirmPaymentResult = await stripe.confirmPaymentIntent({
-        clientSecret: paymentIntent.secret,
+        clientSecret: clientSecret,
         paymentMethod: {
           billingDetails: demoBillingDetails,
           card: cardDetails,
@@ -66,6 +68,7 @@ const CardPaymentScreen = () => {
       });
 
       if (confirmPaymentResult.status === 'succeeded') {
+        setPaymentIntent(confirmPaymentResult);
         console.log('Success!');
       }
     } catch (error) {
@@ -74,7 +77,7 @@ const CardPaymentScreen = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View>
       <TextInput
         placeholder="Card number"
         style={styles.input}
@@ -118,17 +121,16 @@ const CardPaymentScreen = () => {
         }
       />
 
+      <Text>{JSON.stringify(paymentIntent, null, 2)}</Text>
+
       <TouchableOpacity style={styles.button} onPress={handlePressPay}>
         <Text style={styles.text}>Pay with card</Text>
       </TouchableOpacity>
-    </SafeAreaView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    paddingHorizontal: 22,
-  },
   input: {
     height: 44,
     borderBottomWidth: 1,
