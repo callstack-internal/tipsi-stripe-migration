@@ -6,17 +6,12 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import stripe from 'tipsi-stripe';
+import {CardField, useStripe} from '@stripe/stripe-react-native';
 import {BACKEND_URL} from './config';
 
 const CardPaymentScreen = () => {
-  const [paymentIntent, setPaymentIntent] = useState();
-  const [cardDetails, setCardDetails] = useState({
-    number: null,
-    expMonth: null,
-    expYear: null,
-    cvc: null,
-  });
+  const [savedPaymentIntent, setPaymentIntent] = useState();
+  const {confirmPayment} = useStripe();
 
   const createPaymentIntent = async () => {
     try {
@@ -45,83 +40,49 @@ const CardPaymentScreen = () => {
       console.error("Couldn't create a PaymentIntent");
     }
 
-    try {
-      const demoBillingDetails = {
-        address: {
-          city: 'New York',
-          country: 'US',
-          line1: '11 Wall St.',
-          postalCode: '10005',
-          state: 'New York',
-        },
-        email: 'abc@xyz.com',
-        name: 'Jason Bourne',
-        phone: '123-456-7890',
-      };
+    const billingDetails = {
+      email: 'email@stripe.com',
+      phone: '+48888000888',
+      addressCity: 'Houston',
+      addressCountry: 'US',
+      addressLine1: '1459  Circle Drive',
+      addressLine2: 'Texas',
+      addressPostalCode: '77063',
+    };
+    const {error, paymentIntent} = await confirmPayment(clientSecret, {
+      type: 'Card',
+      billingDetails,
+    });
 
-      const confirmPaymentResult = await stripe.confirmPaymentIntent({
-        clientSecret: clientSecret,
-        paymentMethod: {
-          billingDetails: demoBillingDetails,
-          card: cardDetails,
-        },
-      });
-
-      if (confirmPaymentResult.status === 'succeeded') {
-        setPaymentIntent(confirmPaymentResult);
-        console.log('Success!');
-      }
-    } catch (error) {
-      console.error(error);
+    if (error) {
+      console.log('Payment confirmation error', error.message);
+    } else if (paymentIntent) {
+      setPaymentIntent(paymentIntent);
+      console.log('The payment was confirmed successfully!', paymentIntent);
     }
   };
 
   return (
     <View>
-      <TextInput
-        placeholder="Card number"
-        style={styles.input}
-        onChange={value =>
-          setCardDetails(prev => ({
-            ...prev,
-            number: value.nativeEvent.text,
-          }))
-        }
-      />
-      <TextInput
-        placeholder="Expiry month"
-        style={styles.input}
-        onChange={value =>
-          setCardDetails(prev => ({
-            ...prev,
-            expMonth: value.nativeEvent.text,
-          }))
-        }
+      <CardField
+        postalCodeEnabled={false}
+        autofocus
+        placeholder={{
+          number: '4242 4242 4242 4242',
+          postalCode: '12345',
+          cvc: 'CVC',
+          expiration: 'MM|YY',
+        }}
+        onCardChange={cardDetails => {
+          console.log('cardDetails', cardDetails);
+        }}
+        onFocus={focusedField => {
+          console.log('focusField', focusedField);
+        }}
+        style={styles.cardField}
       />
 
-      <TextInput
-        placeholder="Expiry year"
-        style={styles.input}
-        onChange={value =>
-          setCardDetails(prev => ({
-            ...prev,
-            expYear: value.nativeEvent.text,
-          }))
-        }
-      />
-
-      <TextInput
-        placeholder="cvc"
-        style={styles.input}
-        onChange={value =>
-          setCardDetails(prev => ({
-            ...prev,
-            cvc: value.nativeEvent.text,
-          }))
-        }
-      />
-
-      <Text>{JSON.stringify(paymentIntent, null, 2)}</Text>
+      <Text>{JSON.stringify(savedPaymentIntent, null, 2)}</Text>
 
       <TouchableOpacity style={styles.button} onPress={handlePressPay}>
         <Text style={styles.text}>Pay with card</Text>
@@ -131,10 +92,10 @@ const CardPaymentScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  input: {
+  cardField: {
     height: 44,
-    borderBottomWidth: 1,
-    borderBottomColor: '#c0c0c0',
+    width: '100%',
+    marginTop: 30,
   },
   button: {
     backgroundColor: 'darkgreen',

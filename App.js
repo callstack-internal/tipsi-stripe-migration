@@ -1,17 +1,13 @@
-import React, {useEffect} from 'react';
-import {
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  useColorScheme,
-} from 'react-native';
-import stripe from 'tipsi-stripe';
+import React, {useEffect, useState} from 'react';
+import {SafeAreaView, ScrollView, StyleSheet} from 'react-native';
+import {StripeProvider} from '@stripe/stripe-react-native';
 import CardPaymentScreen from './src/CardPaymentScreen';
 import ApplePayScreen from './src/ApplePayScreen';
 import GooglePayScreen from './src/GooglePayScreen';
 import {BACKEND_URL} from './src/config';
 
 const App: React.FC = () => {
+  const [publishableKey, setPublishableKey] = useState();
   const fetchPublishableKey = async () => {
     try {
       const response = await fetch(`${BACKEND_URL}/stripe-key`, {
@@ -24,30 +20,28 @@ const App: React.FC = () => {
       return await response.json();
     } catch (error) {
       console.log(error);
-      return null;
+      return {};
     }
   };
   useEffect(() => {
     async function initialize() {
-      const {publishableKey} = await fetchPublishableKey();
-
-      stripe.setOptions({
-        publishableKey: publishableKey,
-        merchantId: 'MERCHANT_ID', // Optional
-        androidPayMode: 'test', // Android only
-      });
+      const {publishable_key} = await fetchPublishableKey();
+      setPublishableKey(publishable_key);
     }
     initialize();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
     <SafeAreaView>
-      <ScrollView style={styles.container}>
-        <CardPaymentScreen />
-        <ApplePayScreen />
-        <GooglePayScreen />
-      </ScrollView>
+      <StripeProvider
+        publishableKey={publishableKey}
+        merchantIdentifier="com.example.app">
+        <ScrollView style={styles.container}>
+          <CardPaymentScreen />
+          <ApplePayScreen />
+          <GooglePayScreen />
+        </ScrollView>
+      </StripeProvider>
     </SafeAreaView>
   );
 };
