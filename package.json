@@ -12,7 +12,6 @@
     "start:server": "yarn build:server && node ./dist"
   },
   "dependencies": {
-    "@stripe/stripe-react-native": "^0.2.3",
     "react": "17.0.2",
     "react-native": "0.66.4",
     "tipsi-stripe": "^9.2.0"

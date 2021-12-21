@@ -337,19 +337,16 @@ PODS:
     - React-jsi (= 0.66.4)
     - React-logger (= 0.66.4)
     - React-perflogger (= 0.66.4)
-  - Stripe (21.9.1):
-    - Stripe/Stripe3DS2 (= 21.9.1)
-    - StripeCore (= 21.9.1)
-    - StripeUICore (= 21.9.1)
-  - stripe-react-native (0.2.3):
-    - React-Core
-    - Stripe (~> 21.9.0)
-  - Stripe/Stripe3DS2 (21.9.1):
-    - StripeCore (= 21.9.1)
-    - StripeUICore (= 21.9.1)
-  - StripeCore (21.9.1)
-  - StripeUICore (21.9.1):
-    - StripeCore (= 21.9.1)
+  - Stripe (21.10.0):
+    - Stripe/Stripe3DS2 (= 21.10.0)
+    - StripeCore (= 21.10.0)
+    - StripeUICore (= 21.10.0)
+  - Stripe/Stripe3DS2 (21.10.0):
+    - StripeCore (= 21.10.0)
+    - StripeUICore (= 21.10.0)
+  - StripeCore (21.10.0)
+  - StripeUICore (21.10.0):
+    - StripeCore (= 21.10.0)
   - tipsi-stripe (9.2.0):
     - React
     - Stripe (>= 21.3.1)
@@ -410,7 +407,6 @@ DEPENDENCIES:
   - React-RCTVibration (from `../node_modules/react-native/Libraries/Vibration`)
   - React-runtimeexecutor (from `../node_modules/react-native/ReactCommon/runtimeexecutor`)
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
-  - "stripe-react-native (from `../node_modules/@stripe/stripe-react-native`)"
   - tipsi-stripe (from `../node_modules/tipsi-stripe`)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
@@ -493,8 +489,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/runtimeexecutor"
   ReactCommon:
     :path: "../node_modules/react-native/ReactCommon"
-  stripe-react-native:
-    :path: "../node_modules/@stripe/stripe-react-native"
   tipsi-stripe:
     :path: "../node_modules/tipsi-stripe"
   Yoga:
@@ -543,10 +537,9 @@ SPEC CHECKSUMS:
   React-RCTVibration: e3ffca672dd3772536cb844274094b0e2c31b187
   React-runtimeexecutor: dec32ee6f2e2a26e13e58152271535fadff5455a
   ReactCommon: 57b69f6383eafcbd7da625bfa6003810332313c4
-  Stripe: 22c1b8da5ee20a1aaf40fd198160efa72e71644a
-  stripe-react-native: 980f3d19f52a7dc4b373c6c20d30ebd760bc39e5
-  StripeCore: 91ea038ac0abbb72f11014044dfd1e5d39089714
-  StripeUICore: 7edf64b24c9c178bfd97e988f2cffdbb7a7628b0
+  Stripe: fc05d4adae78cf76b069d382183559e1a8a2d77e
+  StripeCore: 809207eb4a39fa7baa2cf9fd7a74f7a35c4140d1
+  StripeUICore: 0ac819b9f67ca22a711aa22106297f6f3c7b86e5
   tipsi-stripe: a28177401206e5a469498f4a1e44634d66f79b2b
   Yoga: e7dc4e71caba6472ff48ad7d234389b91dadc280
   YogaKit: f782866e155069a2cca2517aafea43200b01fd5a
