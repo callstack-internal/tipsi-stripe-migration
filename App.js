@@ -20,12 +20,16 @@ const App: React.FC = () => {
       return await response.json();
     } catch (error) {
       console.log(error);
-      return {};
+      return {error};
     }
   };
   useEffect(() => {
     async function initialize() {
-      const {publishable_key} = await fetchPublishableKey();
+      const {publishable_key, error} = await fetchPublishableKey();
+      if (error) {
+        console.log(error);
+        return;
+      }
       setPublishableKey(publishable_key);
     }
     initialize();
