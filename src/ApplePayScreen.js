@@ -1,10 +1,10 @@
-import {useApplePay} from '@stripe/stripe-react-native';
 import React, {useState} from 'react';
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {useApplePay} from '@stripe/stripe-react-native';
 import {BACKEND_URL} from './config';
 
 const ApplePayScreen = () => {
-  const [pm, setPaymentMethod] = useState();
+  const [savedPaymentMethod, setPaymentMethod] = useState();
   const {presentApplePay, confirmApplePayPayment, isApplePaySupported} =
     useApplePay();
 
@@ -93,7 +93,7 @@ const ApplePayScreen = () => {
           <Text style={styles.text}>Pay with ApplePay</Text>
         </TouchableOpacity>
       )}
-      <Text>{JSON.stringify(pm, null, 2)}</Text>
+      <Text>{JSON.stringify(savedPaymentMethod, null, 2)}</Text>
     </View>
   );
 };
