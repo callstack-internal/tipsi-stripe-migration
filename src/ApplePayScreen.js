@@ -1,40 +1,49 @@
 import React, {useState} from 'react';
-import {Platform, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import stripe from 'tipsi-stripe';
 
 const ApplePayScreen = () => {
   const [applePayToken, setToken] = useState();
+
+  const cart = [
+    {
+      label: 'Whisky',
+      amount: '50.00',
+    },
+    {
+      label: 'Vine',
+      amount: '60.00',
+    },
+    {
+      label: 'Tipsi',
+      amount: '110.00',
+    },
+  ];
+
   const handlePressPay = async () => {
     try {
+      const shippingMethods = [
+        {
+          id: 'fedex',
+          label: 'FedEX',
+          detail: 'Test @ 10',
+          amount: '10.00',
+        },
+      ];
+
       const token = await stripe.paymentRequestWithNativePay(
         {
-          // requiredBillingAddressFields: ['all'],
-          // requiredShippingAddressFields: ['all'],
-          shippingMethods: [
-            {
-              id: 'fedex',
-              label: 'FedEX',
-              detail: 'Test @ 10',
-              amount: '10.00',
-            },
+          requiredShippingAddressFields: [
+            'email',
+            'phone',
+            'postal_address',
+            'name',
           ],
+          requiredBillingAddressFields: ['phone', 'name'],
+          shippingMethods,
         },
-        [
-          {
-            label: 'Whisky',
-            amount: '50.00',
-          },
-          {
-            label: 'Vine',
-            amount: '60.00',
-          },
-          {
-            label: 'Tipsi',
-            amount: '110.00',
-          },
-        ],
+        cart,
       );
-      console.log(token);
 
       setToken(token);
 
@@ -46,7 +55,7 @@ const ApplePayScreen = () => {
 
   return (
     <View>
-      {Platform.OS === 'ios' && (
+      {stripe.deviceSupportsNativePay() && (
         <TouchableOpacity style={styles.button} onPress={handlePressPay}>
           <Text style={styles.text}>Pay with ApplePay</Text>
         </TouchableOpacity>

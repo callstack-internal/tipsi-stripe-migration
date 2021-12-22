@@ -1,10 +1,5 @@
 import React, {useEffect} from 'react';
-import {
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  useColorScheme,
-} from 'react-native';
+import {SafeAreaView, ScrollView, StyleSheet} from 'react-native';
 import stripe from 'tipsi-stripe';
 import CardPaymentScreen from './src/CardPaymentScreen';
 import ApplePayScreen from './src/ApplePayScreen';
@@ -24,21 +19,25 @@ const App: React.FC = () => {
       return await response.json();
     } catch (error) {
       console.log(error);
-      return null;
+      return {error};
     }
   };
   useEffect(() => {
     async function initialize() {
-      const {publishableKey} = await fetchPublishableKey();
+      const {publishable_key, error} = await fetchPublishableKey();
+
+      if (error) {
+        console.log(error);
+        return;
+      }
 
       stripe.setOptions({
-        publishableKey: publishableKey,
+        publishableKey: publishable_key,
         merchantId: 'MERCHANT_ID', // Optional
         androidPayMode: 'test', // Android only
       });
     }
     initialize();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
