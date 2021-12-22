@@ -1,10 +1,41 @@
 import {useGooglePay} from '@stripe/stripe-react-native';
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Platform, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {BACKEND_URL} from './config';
 
 const GooglePayScreen = () => {
   const {initGooglePay, presentGooglePay} = useGooglePay();
+  const [initialized, setInitialized] = useState(false);
+
+  const handlePressPay = async () => {
+    const clientSecret = await fetchPaymentIntentClientSecret();
+
+    const {error} = await presentGooglePay({
+      clientSecret,
+      forSetupIntent: false,
+    });
+
+    if (error) {
+      console.log(error.code, error.message);
+      return;
+    }
+    console.log('Success', 'The payment was confirmed successfully.');
+  };
+
+  const fetchPaymentIntentClientSecret = async () => {
+    const response = await fetch(`${BACKEND_URL}/create-payment-intent`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        currency: 'usd',
+      }),
+    });
+    const {clientSecret} = await response.json();
+
+    return clientSecret;
+  };
 
   useEffect(() => {
     const initialize = async () => {
@@ -23,45 +54,17 @@ const GooglePayScreen = () => {
 
       if (error) {
         console.log(error.code, error.message);
+      } else {
+        setInitialized(true);
       }
     };
 
     initialize();
   });
 
-  const fetchPaymentIntentClientSecret = async () => {
-    const response = await fetch(`${BACKEND_URL}/create-payment-intent`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        currency: 'usd',
-      }),
-    });
-    const {clientSecret} = await response.json();
-
-    return clientSecret;
-  };
-
-  const handlePressPay = async () => {
-    const clientSecret = await fetchPaymentIntentClientSecret();
-
-    const {error} = await presentGooglePay({
-      clientSecret,
-      forSetupIntent: false,
-    });
-
-    if (error) {
-      console.log(error.code, error.message);
-      return;
-    }
-    console.log('Success', 'The payment was confirmed successfully.');
-  };
-
   return (
     <View>
-      {Platform.OS === 'android' && (
+      {initialized && Platform.OS === 'android' && (
         <TouchableOpacity style={styles.button} onPress={handlePressPay}>
           <Text style={styles.text}>Pay with GooglePay</Text>
         </TouchableOpacity>
