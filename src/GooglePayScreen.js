@@ -43,7 +43,7 @@ const GooglePayScreen = () => {
 
   return (
     <View>
-      {Platform.OS === 'android' && (
+      {stripe.deviceSupportsNativePay() && (
         <TouchableOpacity style={styles.button} onPress={handlePressPay}>
           <Text style={styles.text}>Pay with GooglePay</Text>
         </TouchableOpacity>
