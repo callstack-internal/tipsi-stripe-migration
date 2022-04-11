@@ -1,49 +1,70 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {Platform, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-import stripe from 'tipsi-stripe';
+import {useGooglePay} from '@stripe/stripe-react-native';
+import {BACKEND_URL} from './config';
 
 const GooglePayScreen = () => {
+  const {initGooglePay, presentGooglePay} = useGooglePay();
+  const [initialized, setInitialized] = useState(false);
+
   const handlePressPay = async () => {
-    try {
-      const token = await stripe.paymentRequestWithNativePay({
-        total_price: '100.00',
-        currency_code: 'USD',
-        shipping_address_required: true,
-        phone_number_required: true,
-        shipping_countries: ['US', 'CA'],
-        line_items: [
-          {
-            currency_code: 'USD',
-            description: 'Whisky',
-            total_price: '50.00',
-            unit_price: '50.00',
-            quantity: '1',
-          },
-          {
-            currency_code: 'USD',
-            description: 'Vine',
-            total_price: '30.00',
-            unit_price: '30.00',
-            quantity: '1',
-          },
-          {
-            currency_code: 'USD',
-            description: 'Tipsi',
-            total_price: '20.00',
-            unit_price: '20.00',
-            quantity: '1',
-          },
-        ],
-      });
-      console.log(token);
-    } catch (error) {
-      console.error(`Error: ${error}`);
+    const clientSecret = await fetchPaymentIntentClientSecret();
+
+    const {error} = await presentGooglePay({
+      clientSecret,
+      forSetupIntent: false,
+    });
+
+    if (error) {
+      console.log(error.code, error.message);
+      return;
     }
+    console.log('Success', 'The payment was confirmed successfully.');
   };
+
+  const fetchPaymentIntentClientSecret = async () => {
+    const response = await fetch(`${BACKEND_URL}/create-payment-intent`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        currency: 'usd',
+      }),
+    });
+    const {clientSecret} = await response.json();
+
+    return clientSecret;
+  };
+
+  useEffect(() => {
+    const initialize = async () => {
+      const {error} = await initGooglePay({
+        testEnv: true,
+        merchantName: 'Test',
+        countryCode: 'US',
+        billingAddressConfig: {
+          format: 'FULL',
+          isPhoneNumberRequired: true,
+          isRequired: false,
+        },
+        existingPaymentMethodRequired: false,
+        isEmailRequired: true,
+      });
+
+      if (error) {
+        console.log(error.code, error.message);
+      } else {
+        setInitialized(true);
+      }
+    };
+
+    initialize();
+  });
 
   return (
     <View>
-      {stripe.deviceSupportsNativePay() && (
+      {initialized && Platform.OS === 'android' && (
         <TouchableOpacity style={styles.button} onPress={handlePressPay}>
           <Text style={styles.text}>Pay with GooglePay</Text>
         </TouchableOpacity>
